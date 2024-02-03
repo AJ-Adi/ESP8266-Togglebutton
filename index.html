@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP8266 Control Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #status {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #toggleBtn {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>ESP8266 Control Panel</h2>
+    <div id="status">Status: Loading...</div>
+    <button id="toggleBtn" onclick="toggleDevice()">Toggle On/Off</button>
+
+    <script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-database.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+    apiKey: "AIzaSyDzl98R1cZ3fqsdWgIHu5bmBwv7P0pFzI8",
+    authDomain: "iot-project-fea41.firebaseapp.com",
+    databaseURL: "https://iot-project-fea41-default-rtdb.firebaseio.com",
+    projectId: "iot-project-fea41",
+    storageBucket: "iot-project-fea41.appspot.com",
+    messagingSenderId: "429395740188",
+    appId: "1:429395740188:web:9d3daca9e05a7befa941d9",
+    measurementId: "G-Q577WQK80Y"
+  };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const statusElement = document.getElementById('status');
+
+        // Listen for changes in the on/off state and update the UI
+        firebase.database().ref('control/onOff').on('value', (snapshot) => {
+            const currentStatus = snapshot.val();
+            statusElement.innerHTML = `Status: ${currentStatus === 1 ? 'Off' : 'On'}`;
+        });
+
+        // Function to toggle the on/off state in the Firebase Realtime Database
+        function toggleDevice() {
+            firebase.database().ref('control/onOff').once('value', (snapshot) => {
+                const currentValue = snapshot.val();
+                const newValue = (currentValue === 1) ? 0 : 1;
+                firebase.database().ref('control/onOff').set(newValue);
+            });
+        }
+    </script>
+</body>
+</html>
